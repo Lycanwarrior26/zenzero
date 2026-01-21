@@ -28,10 +28,10 @@ const WeeklyReset: React.FC<Props> = ({ state, onComplete, awardBadge }) => {
   }, [step]);
 
   const handleFinish = () => {
-    // Check for Budget Master: Stayed within budget for all categories
+    // Check for Clarity Champion: Stayed within budget for all categories
     const overspent = state.categories.some(c => c.spent > c.budgeted);
     if (!overspent) {
-      awardBadge('budget-master');
+      awardBadge('clarity-champion');
     }
     onComplete();
   };

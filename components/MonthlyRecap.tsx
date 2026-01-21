@@ -33,9 +33,9 @@ const MonthlyRecap: React.FC<Props> = ({ state, onComplete, awardBadge }) => {
   ];
 
   const handleFinish = (newGoal?: Goal) => {
-    // Check for Goal Crusher
+    // Check for Milestone Master (equivalent to previous Goal Crusher logic)
     if (state.goal.current >= state.goal.target) {
-      awardBadge('goal-crusher');
+      awardBadge('milestone-master');
     }
     onComplete(newGoal);
   };

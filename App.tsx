@@ -39,19 +39,80 @@ const INITIAL_STATE: AppState = {
   badges: []
 };
 
-const BADGE_DEFINITIONS: Record<string, Omit<Badge, 'earnedAt'>> = {
-  'consistent-saver': { id: 'consistent-saver', name: 'Consistent Saver', description: '30-day daily check-in streak.', icon: '🔥' },
-  'goal-crusher': { id: 'goal-crusher', name: 'Goal Crusher', description: 'Exceeded monthly savings goal.', icon: '💰' },
-  'budget-master': { id: 'budget-master', name: 'Budget Master', description: 'Stayed within budget for a full week.', icon: '📊' },
-  'first-check-in': { id: 'first-check-in', name: 'Early Bird', description: 'Completed your first daily check-in.', icon: '🎯' }
+export const BADGE_DEFINITIONS: Record<string, Omit<Badge, 'earnedAt'>> = {
+  // 🔥 Getting Started
+  'first-step': { id: 'first-step', name: 'First Step', description: 'Completed your first check-in', icon: '🎯' },
+  'budget-born': { id: 'budget-born', name: 'Budget Born', description: 'Created your first zero-based budget', icon: '👶' },
+  'account-linked': { id: 'account-linked', name: 'Account Linked', description: 'Connected a bank or billing account', icon: '🔗' },
+  'name-it-to-tame-it': { id: 'name-it-to-tame-it', name: 'Name It to Tame It', description: 'Categorized all expenses', icon: '🏷️' },
+  'clarity-seeker': { id: 'clarity-seeker', name: 'Clarity Seeker', description: 'Reviewed spending for 3 days in a row', icon: '🔍' },
+  // 📆 Consistency & Discipline
+  '7-day-streak': { id: '7-day-streak', name: '7-Day Streak', description: 'Checked in 7 days straight', icon: '🔥' },
+  '14-day-lock-in': { id: '14-day-lock-in', name: '14-Day Lock-In', description: 'Two-week check-in streak', icon: '🔐' },
+  '30-day-finisher': { id: '30-day-finisher', name: '30-Day Finisher', description: 'One month of daily check-ins', icon: '🗓️' },
+  'quarter-strong': { id: 'quarter-strong', name: 'Quarter Strong', description: '90 days of consistent tracking', icon: '🏗️' },
+  'unshakeable': { id: 'unshakeable', name: 'Unshakeable', description: '180-day streak', icon: '⛰️' },
+  // 💰 Smart Money Moves
+  'zero-hero': { id: 'zero-hero', name: 'Zero Hero', description: 'Budget balanced to zero for the first time', icon: '🦸' },
+  'expense-slayer': { id: 'expense-slayer', name: 'Expense Slayer', description: 'Cut one recurring bill', icon: '⚔️' },
+  'no-spend-day': { id: 'no-spend-day', name: 'No-Spend Day', description: 'Logged a full day with $0 spent', icon: '🛑' },
+  'needs-vs-wants': { id: 'needs-vs-wants', name: 'Needs vs Wants', description: 'Categorized 100% of expenses correctly', icon: '⚖️' },
+  'bill-boss': { id: 'bill-boss', name: 'Bill Boss', description: 'Paid all bills before due date for one month', icon: '👔' },
+  // 🏦 Savings & Security
+  'emergency-starter': { id: 'emergency-starter', name: 'Emergency Starter', description: 'Saved your first $100', icon: '🆘' },
+  'safety-net': { id: 'safety-net', name: 'Safety Net', description: 'Reached 1 month of expenses saved', icon: '🛡️' },
+  'fort-builder': { id: 'fort-builder', name: 'Fort Builder', description: 'Reached 3 months of expenses saved', icon: '🏰' },
+  'future-proof': { id: 'future-proof', name: 'Future-Proof', description: 'Opened a long-term savings goal', icon: '⏳' },
+  'snowball-starter': { id: 'snowball-starter', name: 'Snowball Starter', description: 'Made first extra debt payment', icon: '❄️' },
+  // 🚀 Growth & Goals
+  'goal-getter': { id: 'goal-getter', name: 'Goal Getter', description: 'Created your first financial goal', icon: '🚀' },
+  'milestone-master': { id: 'milestone-master', name: 'Milestone Master', description: 'Hit a major savings milestone', icon: '🏆' },
+  'vision-builder': { id: 'vision-builder', name: 'Vision Builder', description: 'Planned finances 6 months ahead', icon: '🗺️' },
+  'upgrade-mode': { id: 'upgrade-mode', name: 'Upgrade Mode', description: 'Increased income or side hustle logged', icon: '📈' },
+  'freedom-path': { id: 'freedom-path', name: 'Freedom Path', description: 'Created a financial independence plan', icon: '🔓' },
+  // 🧠 Awareness & Mindset
+  'money-mindful': { id: 'money-mindful', name: 'Money Mindful', description: 'Reflected on spending habits for 7 days', icon: '🧘' },
+  'impulse-breaker': { id: 'impulse-breaker', name: 'Impulse Breaker', description: 'Avoided a planned impulse purchase', icon: '🔨' },
+  'clarity-champion': { id: 'clarity-champion', name: 'Clarity Champion', description: 'Reviewed budget weekly for 1 month', icon: '🥇' },
+  'reality-check': { id: 'reality-check', name: 'Reality Check', description: 'Adjusted budget after overspending', icon: '📉' },
+  'calm-under-pressure': { id: 'calm-under-pressure', name: 'Calm Under Pressure', description: 'Stayed on budget during a tough week', icon: '💎' },
+  // 🎯 Mastery & Elite Tier
+  'budget-architect': { id: 'budget-architect', name: 'Budget Architect', description: 'Built a full yearly budget plan', icon: '📐' },
+  'cash-flow-king-queen': { id: 'cash-flow-king-queen', name: 'Cash Flow King/Queen', description: 'Positive cash flow for 3 months', icon: '👑' },
+  'debt-destroyer': { id: 'debt-destroyer', name: 'Debt Destroyer', description: 'Paid off a major debt', icon: '🧨' },
+  'wealth-builder': { id: 'wealth-builder', name: 'Wealth Builder', description: 'First $10,000 saved or invested', icon: '🏦' },
+  'financial-athlete': { id: 'financial-athlete', name: 'Financial Athlete', description: '365-day check-in streak', icon: '🏃' },
+  // 🏅 Fun & Personality Badges
+  'late-night-logger': { id: 'late-night-logger', name: 'Late-Night Logger', description: 'Checked in after midnight', icon: '🌙' },
+  'early-bird': { id: 'early-bird', name: 'Early Bird', description: 'Checked in before 6 AM', icon: '🌅' },
+  'receipt-hoarder': { id: 'receipt-hoarder', name: 'Receipt Hoarder', description: 'Logged 50 expenses in one week', icon: '🧾' },
+  'the-minimalist': { id: 'the-minimalist', name: 'The Minimalist', description: '3 no-spend days in a row', icon: '🍃' },
+  'comeback-kid': { id: 'comeback-kid', name: 'Comeback Kid', description: 'Returned after 7 days inactive', icon: '🔄' },
+  // 🌟 Legendary / Rare
+  'zen-master': { id: 'zen-master', name: 'Zen Master', description: 'Balanced budget for 6 straight months', icon: '☯️' },
+  'storm-rider': { id: 'storm-rider', name: 'Storm Rider', description: 'Stayed on budget during a financial emergency', icon: '⚡' },
+  'iron-will': { id: 'iron-will', name: 'Iron Will', description: 'No impulse buys for 30 days', icon: '🦾' },
+  'generosity-giver': { id: 'generosity-giver', name: 'Generosity Giver', description: 'Donated or gave consistently for a month', icon: '🎁' },
+  'legacy-builder': { id: 'legacy-builder', name: 'Legacy Builder', description: 'Created estate or legacy plan', icon: '🏛️' },
+  // 🧩 Hidden / Surprise Badges
+  'the-phoenix': { id: 'the-phoenix', name: 'The Phoenix', description: 'Rebuilt budget after hitting zero savings', icon: '🐦' },
+  'wildcard': { id: 'wildcard', name: 'Wildcard', description: 'Used a new feature for the first time', icon: '🃏' },
+  'silent-grinder': { id: 'silent-grinder', name: 'Silent Grinder', description: 'Checked in for 10 days without opening badges', icon: '🤐' },
+  'perfectionist': { id: 'perfectionist', name: 'Perfectionist', description: '100% accurate expense categorization for 30 days', icon: '✨' },
+  'the-ascended': { id: 'the-ascended', name: 'The Ascended', description: 'Earned 25 total badges', icon: '👼' }
 };
 
 const HeaderLogo = () => (
-  <div className="w-10 h-10 bg-indigo-600 rounded-xl shadow-md flex items-center justify-center p-1.5 shrink-0">
-    <svg viewBox="0 0 100 100" className="w-full h-full text-white" fill="none" stroke="currentColor" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M50 20 C65 35 85 45 85 65 C85 80 75 85 50 85 C25 85 15 80 15 65 C15 45 35 35 50 20 Z" />
-      <path d="M50 35 C60 45 75 55 75 70 C75 80 65 82 50 82 C35 82 25 80 25 70 C25 55 40 45 50 35 Z" />
-    </svg>
+  <div className="w-10 h-10 relative transform -rotate-6 shrink-0">
+    <div className="absolute inset-0 bg-gradient-to-br from-[#4db6ac] to-[#004d40] rounded-xl border-2 border-white shadow-md shadow-emerald-900/20" />
+    <div className="absolute inset-0 flex items-center justify-center p-1.5">
+      <svg viewBox="0 0 100 100" className="w-full h-full text-white" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M50 35 C42 45 38 60 38 75 C38 82 44 85 50 85 C56 85 62 82 62 75 C62 60 58 45 50 35 Z" fill="white" fillOpacity="0.1" />
+        <path d="M38 45 C28 48 20 62 20 75 C20 80 25 82 32 82" />
+        <path d="M62 45 C72 48 80 62 80 75 C80 80 75 82 68 82" />
+        <path d="M42 85 C45 92 55 92 58 85" />
+      </svg>
+    </div>
   </div>
 );
 
@@ -72,14 +133,12 @@ const App: React.FC = () => {
     return INITIAL_STATE;
   });
 
-  // Check if session is already active or if we have returning credentials
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  // Fix: Added missing currentView state variable to handle navigation
   const [currentView, setCurrentView] = useState<ViewType>(ViewType.DASHBOARD);
+  const [newBadge, setNewBadge] = useState<Badge | null>(null);
   
   useEffect(() => {
     if (state.userName) {
-      // If we have a user name, we check if they've already "logged in" this session
       const sessionActive = sessionStorage.getItem('zenzero_session_active');
       if (sessionActive === 'true') {
         setIsAuthenticated(true);
@@ -109,11 +168,18 @@ const App: React.FC = () => {
       
       const badgeWithDate: Badge = { ...definition, earnedAt: new Date().toISOString() };
       setNewBadge(badgeWithDate);
-      return { ...prev, badges: [...prev.badges, badgeWithDate] };
+
+      // Special Logic for "The Ascended"
+      const currentBadgeCount = prev.badges.length + 1;
+      let finalBadges = [...prev.badges, badgeWithDate];
+      if (currentBadgeCount === 25 && !prev.badges.some(b => b.id === 'the-ascended')) {
+          const ascendedDef = BADGE_DEFINITIONS['the-ascended'];
+          finalBadges.push({ ...ascendedDef, earnedAt: new Date().toISOString() });
+      }
+
+      return { ...prev, badges: finalBadges };
     });
   }, []);
-
-  const [newBadge, setNewBadge] = useState<Badge | null>(null);
 
   const handleLogin = (name: string, email: string) => {
     setState(prev => ({ ...prev, userName: name, userEmail: email }));
@@ -239,13 +305,13 @@ const App: React.FC = () => {
 
   const completeCheckIn = (dailyRecord: DailyRecord) => {
     if (state.history.length === 0) {
-      awardBadge('first-check-in');
+      awardBadge('first-step');
     }
 
     if (state.history.length >= 29) {
       const last30 = state.history.slice(-29);
       if (last30.every(h => h.checkInCompleted)) {
-        awardBadge('consistent-saver');
+        awardBadge('30-day-finisher');
       }
     }
 
