@@ -5,7 +5,7 @@ import { BADGE_DEFINITIONS } from '../App';
 import { 
   ChevronLeft, Pencil, User, Mail, Award, Database, LogOut, 
   Save, Moon, Sun, Camera, Settings, Check, Shield, Key, 
-  ChevronRight, Lock, Smartphone, Trophy, Star
+  ChevronRight, Lock, Smartphone, Trophy, Star, X, AlertCircle
 } from 'lucide-react';
 
 interface Props {
@@ -21,12 +21,24 @@ const UserProfile: React.FC<Props> = ({ state, onBack, onUpdateUserName, onUpdat
   const [tempName, setTempName] = useState(state.userName || '');
   const [saveFeedback, setSaveFeedback] = useState(false);
   const [showBadges, setShowBadges] = useState(false);
-  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  
+  // Password Change State
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [pwdError, setPwdError] = useState('');
+  const [pwdSuccess, setPwdSuccess] = useState(false);
+  const [isUpdatingPwd, setIsUpdatingPwd] = useState(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Derived stats from state
   const badgesWonCount = state.badges.length; 
   const checkinsCount = state.history.filter(h => h.checkInCompleted).length;
+
+  // Utility for simulation (matching Login.tsx)
+  const mockHash = (str: string) => btoa(`zen_${str}_hash`);
 
   const handleSaveName = () => {
     onUpdateUserName(tempName);
@@ -55,9 +67,58 @@ const UserProfile: React.FC<Props> = ({ state, onBack, onUpdateUserName, onUpdat
     }
   };
 
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPwdError('');
+    setIsUpdatingPwd(true);
+
+    setTimeout(() => {
+      try {
+        const users = JSON.parse(localStorage.getItem('zenzero_users') || '[]');
+        const userIndex = users.findIndex((u: any) => u.email === state.userEmail);
+        
+        if (userIndex === -1) throw new Error("User session not found.");
+        
+        const user = users[userIndex];
+        
+        // Verify current password
+        if (user.passwordHash !== mockHash(currentPassword)) {
+          throw new Error("Current password is incorrect.");
+        }
+
+        // Validate new password
+        if (newPassword.length < 8) {
+          throw new Error("New password must be at least 8 characters.");
+        }
+        if (newPassword !== confirmNewPassword) {
+          throw new Error("Passwords do not match.");
+        }
+
+        // Update password
+        users[userIndex].passwordHash = mockHash(newPassword);
+        localStorage.setItem('zenzero_users', JSON.stringify(users));
+
+        setPwdSuccess(true);
+        setTimeout(() => {
+          setShowChangePassword(false);
+          setPwdSuccess(false);
+          setCurrentPassword('');
+          setNewPassword('');
+          setConfirmNewPassword('');
+        }, 1500);
+
+      } catch (err: any) {
+        setPwdError(err.message);
+      } finally {
+        setIsUpdatingPwd(false);
+      }
+    }, 800);
+  };
+
   const handleLogout = () => {
     if (confirm("Are you sure you want to sign out?")) {
       localStorage.removeItem('zenzero_state');
+      localStorage.removeItem('zenzero_auth_token');
       sessionStorage.removeItem('zenzero_session_active');
       window.location.reload();
     }
@@ -149,34 +210,28 @@ const UserProfile: React.FC<Props> = ({ state, onBack, onUpdateUserName, onUpdat
           </div>
         </div>
 
-        {/* Account Security Placeholder */}
+        {/* Account Security Card */}
         <div className="p-10 bg-slate-50 dark:bg-slate-800/40 rounded-[3rem] border border-slate-200 dark:border-white/10 shadow-sm dark:shadow-2xl space-y-6">
           <div className="flex items-center gap-3 mb-4">
             <Shield className="text-emerald-500 dark:text-emerald-400" size={20} />
-            <h3 className="text-[10px] font-black text-slate-800 dark:text-white uppercase tracking-[0.3em]">Account Security</h3>
+            <h3 className="text-[10px] font-black text-slate-800 dark:text-white uppercase tracking-[0.3em]">ACCOUNT SECURITY</h3>
           </div>
           
           <div className="space-y-4">
-            <button className="w-full flex items-center justify-between p-6 bg-white dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 rounded-2xl transition group border border-slate-100 dark:border-transparent">
+            <button 
+              onClick={() => {
+                setPwdError('');
+                setPwdSuccess(false);
+                setShowChangePassword(true);
+              }}
+              className="w-full flex items-center justify-between p-6 bg-white dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 rounded-2xl transition group border border-slate-100 dark:border-transparent"
+            >
               <div className="flex items-center gap-4 text-slate-700 dark:text-slate-300">
                 <div className="p-3 bg-indigo-100 dark:bg-indigo-500/20 rounded-xl"><Key size={18} className="text-indigo-600 dark:text-indigo-400" /></div>
                 <p className="font-bold">Change Password</p>
               </div>
               <ChevronRight size={20} className="text-slate-400 dark:text-slate-600" />
             </button>
-
-            <div className="w-full flex items-center justify-between p-6 bg-white dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-transparent">
-              <div className="flex items-center gap-4 text-slate-700 dark:text-slate-300">
-                <div className="p-3 bg-emerald-100 dark:bg-emerald-500/20 rounded-xl"><Smartphone size={18} className="text-emerald-600 dark:text-emerald-400" /></div>
-                <p className="font-bold">Two-Factor Auth</p>
-              </div>
-              <button 
-                onClick={() => setTwoFactorEnabled(!twoFactorEnabled)}
-                className={`relative w-14 h-8 rounded-full transition-colors p-1 ${twoFactorEnabled ? 'bg-indigo-600' : 'bg-slate-300 dark:bg-slate-700'}`}
-              >
-                <div className={`w-6 h-6 bg-white rounded-full shadow-lg transform transition-transform ${twoFactorEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
-              </button>
-            </div>
           </div>
         </div>
 
@@ -212,6 +267,82 @@ const UserProfile: React.FC<Props> = ({ state, onBack, onUpdateUserName, onUpdat
            <p className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.5em] mt-2">ZenZero By Forgevyn v2.5.6</p>
         </div>
       </div>
+
+      {/* Change Password Modal */}
+      {showChangePassword && (
+        <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-[600] p-4 backdrop-blur-md animate-in fade-in duration-300">
+          <div className="bg-white dark:bg-slate-900 p-10 md:p-14 rounded-[3.5rem] max-w-md w-full border border-slate-200 dark:border-white/10 shadow-2xl flex flex-col relative animate-in zoom-in-95 duration-500">
+            <button onClick={() => setShowChangePassword(false)} className="absolute top-8 right-8 text-slate-400 hover:text-rose-500 transition text-xl p-2 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center w-10 h-10">✕</button>
+            
+            <div className="mb-8 text-center">
+              <div className="w-16 h-16 bg-indigo-100 dark:bg-indigo-900/40 rounded-2xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 mx-auto mb-4">
+                <Lock size={32} />
+              </div>
+              <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Security Update</h3>
+              <p className="text-sm text-slate-500 font-medium">Secure your ZenZero journey.</p>
+            </div>
+
+            <form onSubmit={handleChangePassword} className="space-y-6">
+              {pwdError && (
+                <div className="p-4 bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 rounded-2xl text-xs font-bold border border-rose-100 dark:border-rose-900/50 flex items-center gap-3">
+                  <AlertCircle size={18} />
+                  {pwdError}
+                </div>
+              )}
+              {pwdSuccess && (
+                <div className="p-4 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-2xl text-xs font-bold border border-emerald-100 dark:border-emerald-900/50 flex items-center gap-3">
+                  <Check size={18} />
+                  Password updated successfully!
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Current Password</label>
+                <input 
+                  type="password" 
+                  required
+                  value={currentPassword}
+                  onChange={e => setCurrentPassword(e.target.value)}
+                  className="w-full p-4 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500 outline-none transition-all" 
+                  placeholder="••••••••"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">New Password</label>
+                <input 
+                  type="password" 
+                  required
+                  value={newPassword}
+                  onChange={e => setNewPassword(e.target.value)}
+                  className="w-full p-4 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500 outline-none transition-all" 
+                  placeholder="••••••••"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Confirm New Password</label>
+                <input 
+                  type="password" 
+                  required
+                  value={confirmNewPassword}
+                  onChange={e => setConfirmNewPassword(e.target.value)}
+                  className="w-full p-4 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500 outline-none transition-all" 
+                  placeholder="••••••••"
+                />
+              </div>
+
+              <button 
+                type="submit"
+                disabled={isUpdatingPwd || pwdSuccess}
+                className="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black shadow-lg flex items-center justify-center gap-3 transition-all hover:bg-indigo-700 active:scale-95 disabled:opacity-50"
+              >
+                {isUpdatingPwd ? "Updating..." : "Update Password"}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Achievement Roadmap Modal */}
       {showBadges && (

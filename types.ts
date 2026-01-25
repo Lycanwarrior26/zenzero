@@ -7,6 +7,14 @@ export enum ViewType {
   USER_PROFILE = 'USER_PROFILE'
 }
 
+export interface AuthUser {
+  id: string;
+  email: string;
+  name: string;
+  image?: string;
+  createdAt: string;
+}
+
 export interface BudgetAllocation {
   bills: number;
   income: number;
@@ -27,14 +35,14 @@ export type CategoryClassification = 'movable' | 'bill' | 'debt';
 export interface BudgetCategory {
   id: string;
   name: string;
-  budgeted: number; // This acts as the "target" or "requirement"
+  budgeted: number;
   spent: number;
   frequency: 'weekly' | 'biweekly' | 'monthly';
   classification: CategoryClassification;
-  dueDate?: string; // Day of month or specific date
-  totalBalance?: number; // For debt categories
-  payoffMonths?: number; // Historical target
-  targetPayoffMonths?: number; // User-selected acceleration goal
+  dueDate?: string;
+  totalBalance?: number;
+  payoffMonths?: number;
+  targetPayoffMonths?: number;
   icon?: string;
 }
 
